@@ -1,0 +1,2688 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest • L'aventure du code</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Lexend:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --dark-blue: #0a1128;
+            --blue: #1282a2;
+            --purple: #6c63ff;
+            --pink: #e94560;
+            --yellow: #ffd369;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --gradient-primary: linear-gradient(135deg, #6c63ff, #1282a2);
+            --gradient-secondary: linear-gradient(135deg, #e94560, #ffd369);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--blue);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--purple);
+        }
+        
+        button, a {
+            cursor: pointer;
+        }
+        
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: white;
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            padding: 0.7rem 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .logo-text {
+            font-family: 'Lexend', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+        }
+        
+        .logo-highlight {
+            color: var(--purple);
+        }
+        
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover {
+            color: var(--purple);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .cta-button {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: var(--dark);
+            transition: var(--transition);
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: var(--transition);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .mobile-menu.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .mobile-menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        .mobile-menu-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .mobile-menu-link:hover {
+            color: var(--purple);
+        }
+        
+        .mobile-cta {
+            margin-top: 2rem;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            position: relative;
+            overflow: hidden;
+            background-color: #f9fafc;
+            margin-top: 72px;
+        }
+        
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content {
+            max-width: 550px;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero-tagline {
+            color: var(--purple);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .hero-tagline-icon {
+            width: 24px;
+            height: 24px;
+            background-color: var(--purple);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .hero-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--dark-blue);
+        }
+        
+        .hero-title span {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+        
+        .hero-description {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .hero-primary-button {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+        
+        .hero-primary-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+        }
+        
+        .hero-secondary-button {
+            background: transparent;
+            color: var(--dark);
+            border: 2px solid #ddd;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .hero-secondary-button:hover {
+            border-color: var(--purple);
+            color: var(--purple);
+            transform: translateY(-3px);
+        }
+        
+        .hero-image {
+            width: 45%;
+            max-width: 500px;
+            position: relative;
+            animation: float 4s ease-in-out infinite, fadeIn 1s ease-out;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+        
+        .code-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .code-particle {
+            position: absolute;
+            opacity: 0.1;
+            font-family: monospace;
+            user-select: none;
+            pointer-events: none;
+        }
+        
+        /* Animated scroll down indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark);
+            animation: fadeIn 1s ease-out 1s forwards;
+            opacity: 0;
+            z-index: 2;
+        }
+        
+        .scroll-text {
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+        
+        .scroll-arrow {
+            width: 30px;
+            height: 50px;
+            border: 2px solid var(--dark);
+            border-radius: 15px;
+            position: relative;
+        }
+        
+        .scroll-arrow::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background-color: var(--dark);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            animation: scrollDown 2s infinite;
+        }
+        
+        @keyframes scrollDown {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(30px);
+            }
+        }
+        
+        /* How it Works Section */
+        .how-it-works {
+            padding: 6rem 2rem;
+            background-color: white;
+        }
+        
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-subtitle {
+            color: var(--purple);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .section-subtitle::before, 
+        .section-subtitle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30px;
+            height: 2px;
+            background: var(--purple);
+            opacity: 0.5;
+        }
+        
+        .section-subtitle::before {
+            left: -40px;
+        }
+        
+        .section-subtitle::after {
+            right: -40px;
+        }
+        
+        .section-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-description {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            color: #666;
+        }
+        
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .step-card {
+            flex: 1;
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+            z-index: -1;
+            transition: var(--transition);
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .step-card:hover::before {
+            height: 100%;
+            opacity: 0.05;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .step-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+        }
+        
+        .step-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .step-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--purple);
+        }
+        
+        /* Game Levels Section */
+        .game-levels {
+            padding: 6rem 2rem;
+            background-color: #f9fafc;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .level-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            height: 100%;
+        }
+        
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .level-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .level-card:hover .level-image {
+            transform: scale(1.05);
+        }
+        
+        .level-content {
+            padding: 1.5rem;
+        }
+        
+        .level-tag {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--gradient-primary);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            z-index: 2;
+        }
+        
+        .level-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+        }
+        
+        .level-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .level-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+        
+        .level-difficulty {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .difficulty-indicator {
+            display: flex;
+        }
+        
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 3px;
+        }
+        
+        .difficulty-dot.active {
+            background-color: var(--pink);
+        }
+        
+        .level-xp {
+            color: var(--purple);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .level-xp i {
+            color: var(--yellow);
+        }
+        
+        .level-progress {
+            margin-top: 1.5rem;
+            background-color: #eee;
+            height: 5px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 5px;
+            transition: width 1.5s ease;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            background-color: white;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-top: 5px solid transparent;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-top-color: var(--purple);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--light);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            color: var(--purple);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover .feature-icon {
+            background: var(--purple);
+            color: white;
+        }
+        
+        .feature-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+        }
+        
+        .feature-description {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        /* Interactive Demo */
+        .interactive-demo {
+            padding: 6rem 2rem;
+            background-color: var(--dark-blue);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1000px;
+            margin: 3rem auto 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .demo-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .demo-dots {
+            display: flex;
+            gap: 0.5rem;
+            margin-right: 1rem;
+        }
+        
+        .demo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .demo-dot:nth-child(1) {
+            background-color: var(--danger);
+        }
+        
+        .demo-dot:nth-child(2) {
+            background-color: var(--warning);
+        }
+        
+        .demo-dot:nth-child(3) {
+            background-color: var(--success);
+        }
+        
+        .demo-title {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .demo-content {
+            display: flex;
+            height: 400px;
+        }
+        
+        .code-editor {
+            flex: 1;
+            padding: 1rem;
+            background: #1e1e1e;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-y: auto;
+            color: #d4d4d4;
+        }
+        
+        .code-line {
+            display: flex;
+            margin-bottom: 0.3rem;
+        }
+        
+        .line-number {
+            width: 30px;
+            color: #6a737d;
+            user-select: none;
+        }
+        
+        .code-highlight {
+            color: #9cdcfe;
+        }
+        
+        .code-keyword {
+            color: #569cd6;
+        }
+        
+        .code-string {
+            color: #ce9178;
+        }
+        
+        .code-comment {
+            color: #6a9955;
+        }
+        
+        .code-preview {
+            flex: 1;
+            background: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+        
+        .preview-content {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--dark);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .preview-header {
+            width: 100%;
+            background: var(--purple);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .preview-body {
+            flex: 1;
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .preview-button {
+            background: var(--purple);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .demo-action {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .task-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .run-button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .run-button:hover {
+            background: #1f9938;
+            transform: translateY(-2px);
+        }
+        
+        /* Code Animation backgrounds */
+        .code-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%231282a2' fill-opacity='0.05'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -1;
+            opacity: 0.5;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 2rem;
+            background-color: #f9fafc;
+            position: relative;
+        }
+        
+        .testimonials .code-bg {
+            opacity: 0.2;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .testimonial-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: var(--transition);
+            height: 100%;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .quote-icon {
+            position: absolute;
+            top: -15px;
+            left: 2rem;
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .testimonial-text {
+            margin-bottom: 1.5rem;
+            color: #444;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .testimonial-text::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: -10px;
+            font-size: 5rem;
+            color: rgba(0, 0, 0, 0.03);
+            z-index: -1;
+            font-family: Georgia, serif;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .author-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .author-name {
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+        
+        .author-title {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* Pricing */
+        .pricing {
+            padding: 6rem 2rem;
+            background: white;
+        }
+        
+        .pricing-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 3rem 0;
+        }
+        
+        .toggle-option {
+            font-weight: 600;
+            color: #666;
+            transition: var(--transition);
+        }
+        
+        .toggle-option.active {
+            color: var(--dark-blue);
+        }
+        
+        .toggle-switch {
+            width: 60px;
+            height: 30px;
+            background: var(--gradient-primary);
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.3s var(--transition);
+        }
+        
+        .toggle-switch.yearly::after {
+            left: calc(100% - 27px);
+        }
+        
+        .pricing-cards {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid #eee;
+            padding: 2rem;
+            width: 300px;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: var(--gradient-primary);
+            z-index: -1;
+            transition: var(--transition);
+            opacity: 0.03;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--purple);
+        }
+        
+        .pricing-card:hover::before {
+            height: 100%;
+        }
+        
+        .pricing-card.featured {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 10px 30px rgba(108, 99, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+        
+        .featured-tag {
+            position: absolute;
+            top: 30px;
+            right: -35px;
+            background: var(--pink);
+            color: white;
+            padding: 0.3rem 2.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+            z-index: 2;
+        }
+        
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .featured .pricing-title {
+            color: white;
+        }
+        
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+        
+        .featured .pricing-price {
+            color: white;
+        }
+        
+        .pricing-duration {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .featured .pricing-duration {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .feature-check {
+            color: var(--success);
+            font-size: 1.2rem;
+            line-height: 1;
+            margin-top: 0.2rem;
+        }
+        
+        .featured .feature-check {
+            color: var(--yellow);
+        }
+        
+        .pricing-button {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .standard-button {
+            background: white;
+            color: var(--purple);
+            border: 1px solid var(--purple);
+        }
+        
+        .standard-button:hover {
+            background: var(--purple);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .featured-button {
+            background: white;
+            color: var(--purple);
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .featured-button:hover {
+            background: var(--yellow);
+            color: var(--dark-blue);
+            transform: translateY(-3px);
+        }
+        
+        /* CTA */
+        .cta {
+            padding: 6rem 2rem;
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: 0;
+        }
+        
+        .cta-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-description {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-input {
+            flex: 1;
+            padding: 1.2rem 1.5rem;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+        }
+        
+        .cta-input:focus {
+            outline: none;
+        }
+        
+        .cta-button {
+            background: var(--yellow);
+            color: var(--dark-blue);
+            border: none;
+            padding: 0 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cta-button:hover {
+            background: var(--dark-blue);
+            color: white;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--dark-blue);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+        
+        .footer-logo {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-logo-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+        }
+        
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            max-width: 300px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .social-link:hover {
+            background: var(--purple);
+            transform: translateY(-3px);
+        }
+        
+        .footer-heading {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: white;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--purple);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-link {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-link a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-block;
+        }
+        
+        .footer-link a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+        
+        .download-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .download-button {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .download-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .download-icon {
+            font-size: 1.5rem;
+        }
+        
+        .download-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .download-small {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+        
+        .download-large {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .copyright {
+            max-width: 1200px;
+            margin: 4rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 99;
+        }
+        
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
+        }
+        
+        /* Fade in animation for elements */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .fade-in.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .hero-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-content {
+                max-width: 100%;
+                margin-bottom: 3rem;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-image {
+                width: 80%;
+            }
+            
+            .steps {
+                flex-direction: column;
+            }
+            
+            .demo-content {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .code-editor, .code-preview {
+                height: 300px;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .cta-title {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links, .cta-button {
+                display: none;
+            }
+            
+            .hamburger {
+                display: flex;
+            }
+            
+            .hero {
+                margin-top: 60px;
+                padding: 0 1rem;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .section-subtitle::before, 
+            .section-subtitle::after {
+                display: none;
+            }
+            
+            .demo-action {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .run-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .pricing-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pricing-card {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+            
+            .pricing-card.featured:hover {
+                transform: translateY(-10px);
+            }
+            
+            .cta-title {
+                font-size: 2rem;
+            }
+            
+            .cta-form {
+                flex-direction: column;
+                border-radius: 10px;
+            }
+            
+            .cta-input, .cta-button {
+                width: 100%;
+                border-radius: 0;
+            }
+            
+            .cta-button {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-description {
+                font-size: 1rem;
+            }
+            
+            .step-card {
+                padding: 1.5rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+            
+            .testimonial-card {
+                padding: 1.5rem;
+            }
+            
+            .pricing-card {
+                padding: 1.5rem;
+            }
+            
+            .hero-buttons {
+                width: 100%;
+            }
+            
+            .hero-primary-button,
+            .hero-secondary-button {
+                width: 100%;
+            }
+            
+            .footer-content {
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to top button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="logo">
+            <div class="logo-icon">C</div>
+            <div class="logo-text">Code<span class="logo-highlight">Quest</span></div>
+        </a>
+        
+        <div class="nav-links">
+            <a href="#how-it-works" class="nav-link">Comment ça marche</a>
+            <a href="#game-levels" class="nav-link">Niveaux</a>
+            <a href="#features" class="nav-link">Fonctionnalités</a>
+            <a href="#pricing" class="nav-link">Tarifs</a>
+        </div>
+        
+        <button onclick="window.location.href='login.html'" class="cta-button">Commencer gratuitement</button>
+        
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-links">
+            <a href="#" class="mobile-menu-link">Accueil</a>
+            <a href="#how-it-works" class="mobile-menu-link">Comment ça marche</a>
+            <a href="#game-levels" class="mobile-menu-link">Niveaux</a>
+            <a href="#features" class="mobile-menu-link">Fonctionnalités</a>
+            <a href="#pricing" class="mobile-menu-link">Tarifs</a>
+        </div>
+        <div class="mobile-cta">
+            <button class="cta-button">Commencer gratuitement</button>
+        </div>
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="code-particles" id="code-particles"></div>
+        
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-tagline">
+                    <div class="hero-tagline-icon"><i class="fas fa-code"></i></div>
+                    Apprenez en vous amusant
+                </div>
+                <h1 class="hero-title">Maîtrisez le code à travers une <span>aventure épique</span></h1>
+                <p class="hero-description">CodeQuest transforme l'apprentissage du HTML, CSS et JavaScript en une aventure ludique avec des défis, des récompenses et une progression qui vous garde motivé à chaque étape.</p>
+                <div class="hero-buttons">
+                    <button class="hero-primary-button">Commencer l'aventure</button>
+                    <button class="hero-secondary-button">Voir la démo</button>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="CodeQuest Interface">
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <span class="scroll-text">SCROLL</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+    
+    <!-- How it Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Notre approche</span>
+                <h2 class="section-title">Comment fonctionne CodeQuest</h2>
+                <p class="section-description">Une méthode unique qui combine apprentissage et jeu pour vous aider à maîtriser le développement web de manière efficace et engageante.</p>
+            </div>
+            
+            <div class="steps">
+                <div class="step-card fade-in">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="fas fa-gamepad"></i></div>
+                    <h3 class="step-title">Jouez et Apprenez</h3>
+                    <p class="step-description">Complétez des défis de code interactifs conçus comme des niveaux de jeu, où chaque solution vous fait progresser dans votre aventure.</p>
+                </div>
+                
+                <div class="step-card fade-in">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="fas fa-trophy"></i></div>
+                    <h3 class="step-title">Gagnez des Récompenses</h3>
+                    <p class="step-description">Obtenez des points d'expérience, des badges et déverrouillez de nouveaux mondes à mesure que vous développez vos compétences en codage.</p>
+                </div>
+                
+                <div class="step-card fade-in">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="fas fa-rocket"></i></div>
+                    <h3 class="step-title">Maîtrisez le Web</h3>
+                    <p class="step-description">Progressez des bases jusqu'aux concepts avancés, en créant de véritables projets web qui renforcent votre portfolio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Game Levels Section -->
+    <section class="game-levels" id="game-levels">
+        <div class="code-bg"></div>
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Votre aventure</span>
+                <h2 class="section-title">Mondes et niveaux à explorer</h2>
+                <p class="section-description">Parcourez différents mondes thématiques qui vous enseignent chaque aspect du développement web à travers des défis progressivement plus complexes.</p>
+            </div>
+            
+            <div class="level-grid">
+                <div class="level-card fade-in">
+                    <img src="https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="HTML Fundamentals" class="level-image">
+                    <span class="level-tag">Monde 1</span>
+                    <div class="level-content">
+                        <h3 class="level-title">Forêt des Balises HTML</h3>
+                        <p class="level-description">Explorez les fondements du HTML en naviguant à travers une forêt enchantée où chaque arbre représente une balise différente.</p>
+                        <div class="level-meta">
+                            <div class="level-difficulty">
+                                <div class="difficulty-indicator">
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot"></div>
+                                    <div class="difficulty-dot"></div>
+                                </div>
+                                <span>Débutant</span>
+                            </div>
+                            <div class="level-xp">
+                                <i class="fas fa-star"></i>
+                                <span>500 XP</span>
+                            </div>
+                        </div>
+                        <div class="level-progress">
+                            <div class="progress-bar" style="width: 75%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="level-card fade-in">
+                    <img src="https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="CSS Styling" class="level-image">
+                    <span class="level-tag">Monde 2</span>
+                    <div class="level-content">
+                        <h3 class="level-title">Cascades de Style CSS</h3>
+                        <p class="level-description">Maîtrisez les cascades de style en surmontant des défis qui vous apprennent à styliser des pages web avec précision et créativité.</p>
+                        <div class="level-meta">
+                            <div class="level-difficulty">
+                                <div class="difficulty-indicator">
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot"></div>
+                                </div>
+                                <span>Intermédiaire</span>
+                            </div>
+                            <div class="level-xp">
+                                <i class="fas fa-star"></i>
+                                <span>650 XP</span>
+                            </div>
+                        </div>
+                        <div class="level-progress">
+                            <div class="progress-bar" style="width: 40%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="level-card fade-in">
+                    <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="JavaScript Magic" class="level-image">
+                    <span class="level-tag">Monde 3</span>
+                    <div class="level-content">
+                        <h3 class="level-title">Vallée JavaScript</h3>
+                        <p class="level-description">Donnez vie à vos sites web en apprenant le JavaScript à travers une série de quêtes interactives dans une vallée dynamique pleine de surprises.</p>
+                        <div class="level-meta">
+                            <div class="level-difficulty">
+                                <div class="difficulty-indicator">
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot active"></div>
+                                </div>
+                                <span>Avancé</span>
+                            </div>
+                            <div class="level-xp">
+                                <i class="fas fa-star"></i>
+                                <span>800 XP</span>
+                            </div>
+                        </div>
+                        <div class="level-progress">
+                            <div class="progress-bar" style="width: 15%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="level-card fade-in">
+                    <img src="https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Responsive Design" class="level-image">
+                    <span class="level-tag">Monde 4</span>
+                    <div class="level-content">
+                        <h3 class="level-title">Mont Responsive</h3>
+                        <p class="level-description">Gravissez le mont du design responsive en apprenant à adapter vos sites web à tous les appareils et tailles d'écran.</p>
+                        <div class="level-meta">
+                            <div class="level-difficulty">
+                                <div class="difficulty-indicator">
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot active"></div>
+                                </div>
+                                <span>Avancé</span>
+                            </div>
+                            <div class="level-xp">
+                                <i class="fas fa-star"></i>
+                                <span>750 XP</span>
+                            </div>
+                        </div>
+                        <div class="level-progress">
+                            <div class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Pourquoi nous choisir</span>
+                <h2 class="section-title">Des fonctionnalités qui font la différence</h2>
+                <p class="section-description">CodeQuest propose une expérience d'apprentissage unique qui rend le code accessible, amusant et efficace pour tous les niveaux.</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+                    <h3 class="feature-title">Apprentissage actif</h3>
+                    <p class="feature-description">Apprenez en pratiquant avec des défis interactifs qui renforcent les concepts à travers la résolution de problèmes concrets.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-puzzle-piece"></i></div>
+                    <h3 class="feature-title">Progression par niveaux</h3>
+                    <p class="feature-description">Avancez à votre rythme à travers des niveaux progressifs qui s'adaptent à votre courbe d'apprentissage.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-medal"></i></div>
+                    <h3 class="feature-title">Système de récompenses</h3>
+                    <p class="feature-description">Gagnez des badges, des points et débloquez de nouveaux contenus pour maintenir votre motivation tout au long du parcours.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-users"></i></div>
+                    <h3 class="feature-title">Communauté d'entraide</h3>
+                    <p class="feature-description">Rejoignez une communauté active d'apprenants et d'experts pour échanger des astuces et résoudre des défis ensemble.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3 class="feature-title">Multi-plateforme</h3>
+                    <p class="feature-description">Accédez à CodeQuest depuis n'importe quel appareil pour apprendre où que vous soyez, quand vous le souhaitez.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="feature-title">Suivi de progression</h3>
+                    <p class="feature-description">Visualisez votre progression et identifiez vos points forts et domaines à améliorer grâce à des analyses détaillées.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Interactive Demo -->
+    <section class="interactive-demo" id="demo">
+        <div class="code-bg"></div>
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Essayez par vous-même</span>
+                <h2 class="section-title">Un aperçu de l'expérience CodeQuest</h2>
+                <p class="section-description">Découvrez à quoi ressemble l'apprentissage sur notre plateforme avec cet exemple interactif.</p>
+            </div>
+            
+            <div class="demo-container fade-in">
+                <div class="demo-header">
+                    <div class="demo-dots">
+                        <div class="demo-dot"></div>
+                        <div class="demo-dot"></div>
+                        <div class="demo-dot"></div>
+                    </div>
+                    <div class="demo-title">Défi: Créer un bouton interactif</div>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="code-editor">
+                        <div class="code-line">
+                            <span class="line-number">1</span>
+                            <span><span class="code-highlight">&lt;!DOCTYPE html&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">2</span>
+                            <span><span class="code-highlight">&lt;html&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">3</span>
+                            <span><span class="code-highlight">&lt;head&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">4</span>
+                            <span>    <span class="code-highlight">&lt;title&gt;</span>Mon Bouton Magique<span class="code-highlight">&lt;/title&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">5</span>
+                            <span>    <span class="code-highlight">&lt;style&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">6</span>
+                            <span>        <span class="code-keyword">.magic-button</span> {</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">7</span>
+                            <span>            <span class="code-keyword">background-color</span>: <span class="code-string">#6c63ff</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">8</span>
+                            <span>            <span class="code-keyword">color</span>: <span class="code-string">white</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">9</span>
+                            <span>            <span class="code-keyword">padding</span>: <span class="code-string">15px 30px</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">10</span>
+                            <span>            <span class="code-keyword">border</span>: <span class="code-string">none</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">11</span>
+                            <span>            <span class="code-keyword">border-radius</span>: <span class="code-string">50px</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">12</span>
+                            <span>            <span class="code-keyword">font-size</span>: <span class="code-string">16px</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">13</span>
+                            <span>            <span class="code-keyword">cursor</span>: <span class="code-string">pointer</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">14</span>
+                            <span>            <span class="code-keyword">transition</span>: <span class="code-string">all 0.3s ease</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">15</span>
+                            <span>        }</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">16</span>
+                            <span>        </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">17</span>
+                            <span>        <span class="code-keyword">.magic-button:hover</span> {</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">18</span>
+                            <span>            <span class="code-keyword">background-color</span>: <span class="code-string">#ffd369</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">19</span>
+                            <span>            <span class="code-keyword">color</span>: <span class="code-string">#333</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">20</span>
+                            <span>            <span class="code-keyword">transform</span>: <span class="code-string">translateY(-5px)</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">21</span>
+                            <span>            <span class="code-keyword">box-shadow</span>: <span class="code-string">0 10px 20px rgba(0,0,0,0.1)</span>;</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">22</span>
+                            <span>        }</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">23</span>
+                            <span>    <span class="code-highlight">&lt;/style&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">24</span>
+                            <span><span class="code-highlight">&lt;/head&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">25</span>
+                            <span><span class="code-highlight">&lt;body&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">26</span>
+                            <span>    <span class="code-highlight">&lt;header&gt;</span>Défi CodeQuest<span class="code-highlight">&lt;/header&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">27</span>
+                            <span>    <span class="code-comment"><!-- Votre défi: créer un bouton magique --></span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">28</span>
+                            <span>    <span class="code-highlight">&lt;button class="magic-button"&gt;</span>Cliquez-moi !<span class="code-highlight">&lt;/button&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">29</span>
+                            <span><span class="code-highlight">&lt;/body&gt;</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">30</span>
+                            <span><span class="code-highlight">&lt;/html&gt;</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="code-preview">
+                        <div class="preview-content">
+                            <div class="preview-header">Défi CodeQuest</div>
+                            <div class="preview-body">
+                                <button class="preview-button" id="previewButton">Cliquez-moi !</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="demo-action">
+                    <div class="task-description">
+                        Défi: Modifiez le code pour changer la couleur du bouton au survol.
+                    </div>
+                    <button class="run-button">
+                        <i class="fas fa-play"></i> Exécuter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials -->
+    <section class="testimonials" id="testimonials">
+        <div class="code-bg"></div>
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Ils nous ont fait confiance</span>
+                <h2 class="section-title">Ce que disent nos apprenants</h2>
+                <p class="section-description">Découvrez comment CodeQuest a aidé des milliers d'étudiants à transformer leur approche de l'apprentissage du code.</p>
+            </div>
+            
+            <div class="testimonial-grid">
+                <div class="testimonial-card fade-in">
+                    <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+                    <p class="testimonial-text">Grâce à l'approche ludique de CodeQuest, j'ai appris plus en 3 mois qu'en 1 an avec des méthodes traditionnelles. Je me suis surpris à coder pendant des heures sans m'ennuyer !</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Thomas D." class="author-avatar">
+                        <div class="author-info">
+                            <div class="author-name">Thomas D.</div>
+                            <div class="author-title">Étudiant en reconversion</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card fade-in">
+                    <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+                    <p class="testimonial-text">Le système de progression et de récompenses m'a vraiment motivée à continuer. Chaque défi relevé est une petite victoire qui m'a poussée à aller plus loin dans mon apprentissage.</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sophie M." class="author-avatar">
+                        <div class="author-info">
+                            <div class="author-name">Sophie M.</div>
+                            <div class="author-title">Designer UX/UI</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card fade-in">
+                    <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+                    <p class="testimonial-text">J'utilisais CodeQuest avec mes élèves de collège et l'engagement a été immédiat ! Ils ont adoré l'aspect jeu et ont développé des compétences techniques bien plus rapidement.</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Pierre L." class="author-avatar">
+                        <div class="author-info">
+                            <div class="author-name">Pierre L.</div>
+                            <div class="author-title">Professeur de technologie</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Nos offres</span>
+                <h2 class="section-title">Trouvez le plan qui vous convient</h2>
+                <p class="section-description">Des options flexibles pour les apprenants de tous niveaux, de l'étudiant au professionnel en reconversion.</p>
+            </div>
+            
+            <div class="pricing-toggle">
+                <div class="toggle-option active" id="monthlyOption">Mensuel</div>
+                <div class="toggle-switch" id="pricingToggle"></div>
+                <div class="toggle-option" id="yearlyOption">Annuel</div>
+            </div>
+            
+            <div class="pricing-cards">
+                <div class="pricing-card fade-in">
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Explorer</h3>
+                        <div class="pricing-price">Gratuit</div>
+                        <div class="pricing-duration">pour toujours</div>
+                    </div>
+                    
+                    <ul class="pricing-features">
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Accès au premier monde</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>10 défis de code</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Suivi de progression basique</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Forum communautaire</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="pricing-button standard-button">Commencer gratuitement</button>
+                </div>
+                
+                <div class="pricing-card featured fade-in">
+                    <div class="featured-tag">Populaire</div>
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Aventurier</h3>
+                        <div class="pricing-price">14,99€</div>
+                        <div class="pricing-duration">par mois</div>
+                    </div>
+                    
+                    <ul class="pricing-features">
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Accès à tous les mondes</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>+200 défis de code</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Suivi détaillé de progression</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Support par email</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Projets pratiques</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="pricing-button featured-button">S'abonner maintenant</button>
+                </div>
+                
+                <div class="pricing-card fade-in">
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Maître du Code</h3>
+                        <div class="pricing-price">24,99€</div>
+                        <div class="pricing-duration">par mois</div>
+                    </div>
+                    
+                    <ul class="pricing-features">
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Tout ce qui est inclus dans Aventurier</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Exercices avancés exclusifs</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Sessions de coaching personnalisées</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Certification de compétences</span>
+                        </li>
+                        <li class="pricing-feature">
+                            <span class="feature-check"><i class="fas fa-check"></i></span>
+                            <span>Accès anticipé aux nouveautés</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="pricing-button standard-button">Devenir un maître</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action -->
+    <section class="cta" id="cta">
+        <div class="section-container">
+            <h2 class="cta-title fade-in">Prêt à transformer votre apprentissage du code ?</h2>
+            <p class="cta-description fade-in">Rejoignez des milliers d'apprenants qui ont déjà commencé leur aventure avec CodeQuest et maîtrisez le développement web de manière ludique et engageante.</p>
+            
+            <form class="cta-form fade-in">
+                <input type="email" placeholder="Votre adresse email" class="cta-input" required>
+                <button type="submit" class="cta-button">Commencer gratuitement</button>
+            </form>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">C</div>
+                    CodeQuest
+                </div>
+                <p class="footer-description">Une approche révolutionnaire pour apprendre le développement web à travers une aventure ludique et immersive.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h4 class="footer-heading">Navigation</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Accueil</a></li>
+                    <li class="footer-link"><a href="#how-it-works">Comment ça marche</a></li>
+                    <li class="footer-link"><a href="#game-levels">Niveaux</a></li>
+                    <li class="footer-link"><a href="#features">Fonctionnalités</a></li>
+                    <li class="footer-link"><a href="#pricing">Tarifs</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4 class="footer-heading">Légal</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Conditions d'utilisation</a></li>
+                    <li class="footer-link"><a href="#">Politique de confidentialité</a></li>
+                    <li class="footer-link"><a href="#">Cookies</a></li>
+                    <li class="footer-link"><a href="#">Mentions légales</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4 class="footer-heading">Application</h4>
+                <div class="download-buttons">
+                    <div class="download-button">
+                        <div class="download-icon"><i class="fab fa-apple"></i></div>
+                        <div class="download-text">
+                            <span class="download-small">Télécharger sur</span>
+                            <span class="download-large">App Store</span>
+                        </div>
+                    </div>
+                    <div class="download-button">
+                        <div class="download-icon"><i class="fab fa-google-play"></i></div>
+                        <div class="download-text">
+                            <span class="download-small">Disponible sur</span>
+                            <span class="download-large">Google Play</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            &copy; 2025 CodeQuest. Tous droits réservés.
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation Scroll Effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Mobile Menu Toggle
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            hamburger.addEventListener('click', function() {
+                this.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+                document.body.classList.toggle('menu-open');
+            });
+            
+            // Close mobile menu when clicking on a link
+            document.querySelectorAll('.mobile-menu-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                });
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (!targetElement) return;
+                    
+                    const navbarHeight = navbar.offsetHeight;
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Back to top button
+            const backToTop = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('active');
+                } else {
+                    backToTop.classList.remove('active');
+                }
+            });
+            
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Fade in elements on scroll
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            function checkFade() {
+                fadeElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementTop < windowHeight * 0.85) {
+                        element.classList.add('active');
+                    }
+                });
+            }
+            
+            // Initial check for elements in view
+            checkFade();
+            
+            // Check on scroll
+            window.addEventListener('scroll', checkFade);
+            
+            // Code particles animation
+            const particles = document.getElementById('code-particles');
+            const codeSnippets = [
+                '<div>', '</div>', '<span>', '</span>', '<h1>', '</h1>',
+                'function()', 'return', 'const', 'let', 'var', 'if()', 'else',
+                '{...}', '[ ]', '( )', '=>',
+                '.class', '#id', '* { }',
+                '@media', '@keyframes', 'animation',
+                'display: flex;', 'margin: 0;', 'padding: 10px;',
+                'addEventListener', 'querySelector', 'getElementById'
+            ];
+            
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.classList.add('code-particle');
+                
+                // Random position
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // Random code snippet
+                const snippet = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+                
+                // Random size
+                const size = Math.floor(Math.random() * 10) + 10;
+                
+                // Random opacity
+                const opacity = Math.random() * 0.1 + 0.05;
+                
+                // Random rotation
+                const rotation = Math.random() * 360;
+                
+                particle.style.left = `${x}%`;
+                particle.style.top = `${y}%`;
+                particle.style.fontSize = `${size}px`;
+                particle.style.opacity = opacity;
+                particle.style.transform = `rotate(${rotation}deg)`;
+                particle.textContent = snippet;
+                
+                particles.appendChild(particle);
+                
+                // Remove particle after some time
+                setTimeout(() => {
+                    if (particle.parentNode === particles) {
+                        particles.removeChild(particle);
+                    }
+                }, 8000);
+            }
+            
+            // Create particles periodically
+            let particleInterval = setInterval(createParticle, 1000);
+            
+            // Create initial particles
+            for (let i = 0; i < 15; i++) {
+                createParticle();
+            }
+            
+            // Clean up particles when leaving the page
+            window.addEventListener('beforeunload', function() {
+                clearInterval(particleInterval);
+            });
+            
+            // Preview button effect in demo section
+            const previewButton = document.getElementById('previewButton');
+            if (previewButton) {
+                previewButton.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = '#ffd369';
+                    this.style.color = '#333';
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+                });
+                
+                previewButton.addEventListener('mouseout', function() {
+                    this.style.backgroundColor = '#6c63ff';
+                    this.style.color = 'white';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            }
+            
+            // Run code button effect
+            const runButton = document.querySelector('.run-button');
+            if (runButton) {
+                runButton.addEventListener('click', function() {
+                    // In a real application, this would execute the code
+                    // For demo purposes, we'll just show an alert
+                    alert('Bravo ! Vous avez complété le défi. +50 XP ! 🏆');
+                });
+            }
+            
+            // Pricing toggle
+            const pricingToggle = document.getElementById('pricingToggle');
+            const monthlyOption = document.getElementById('monthlyOption');
+            const yearlyOption = document.getElementById('yearlyOption');
+            
+            if (pricingToggle && monthlyOption && yearlyOption) {
+                pricingToggle.addEventListener('click', function() {
+                    this.classList.toggle('yearly');
+                    monthlyOption.classList.toggle('active');
+                    yearlyOption.classList.toggle('active');
+                    
+                    // Update pricing
+                    const priceElements = document.querySelectorAll('.pricing-price');
+                    const durationElements = document.querySelectorAll('.pricing-duration');
+                    
+                    if (this.classList.contains('yearly')) {
+                        // Monthly prices
+                        if (priceElements[1]) priceElements[1].textContent = '149,99€';
+                        if (priceElements[2]) priceElements[2].textContent = '249,99€';
+                        
+                        // Update duration text
+                        if (durationElements[1]) durationElements[1].textContent = 'par an';
+                        if (durationElements[2]) durationElements[2].textContent = 'par an';
+                    } else {
+                        // Yearly prices
+                        if (priceElements[1]) priceElements[1].textContent = '14,99€';
+                        if (priceElements[2]) priceElements[2].textContent = '24,99€';
+                        
+                        // Update duration text
+                        if (durationElements[1]) durationElements[1].textContent = 'par mois';
+                        if (durationElements[2]) durationElements[2].textContent = 'par mois';
+                    }
+                });
+            }
+            
+            // Animate progress bars on scroll into view
+            const progressBars = document.querySelectorAll('.progress-bar');
+            
+            function animateProgressBars() {
+                progressBars.forEach(progressBar => {
+                    const rect = progressBar.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.bottom > 0) {
+                        const targetWidth = progressBar.style.width;
+                        progressBar.style.width = '0';
+                        setTimeout(() => {
+                            progressBar.style.width = targetWidth;
+                        }, 100);
+                    }
+                });
+            }
+            
+            // Initial check for progress bars in view
+            animateProgressBars();
+            
+            // Check on scroll
+            window.addEventListener('scroll', animateProgressBars);
+        });
+    </script>
+</body>
+</html>

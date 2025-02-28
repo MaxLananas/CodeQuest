@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest • Authentification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Lexend:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --dark-blue: #0a1128;
+            --blue: #1282a2;
+            --purple: #6c63ff;
+            --pink: #e94560;
+            --yellow: #ffd369;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --gradient-primary: linear-gradient(135deg, #6c63ff, #1282a2);
+            --gradient-secondary: linear-gradient(135deg, #e94560, #ffd369);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--blue);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--purple);
+        }
+        
+        button, a {
+            cursor: pointer;
+        }
+        
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: white;
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .logo-text {
+            font-family: 'Lexend', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+        }
+        
+        .logo-highlight {
+            color: var(--purple);
+        }
+        
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover {
+            color: var(--purple);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        /* Auth Pages */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            padding-top: 80px;
+            background-color: #f9fafc;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236c63ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: 0;
+        }
+        
+        .auth-box {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            max-width: 1000px;
+            width: 90%;
+            margin: auto;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .auth-visual {
+            flex: 1;
+            background: var(--gradient-primary);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-visual::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: 0;
+        }
+        
+        .auth-visual-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .auth-visual-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-visual-description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .auth-visual-image {
+            width: 80%;
+            max-width: 300px;
+            margin: 0 auto;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .auth-visual-badges {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+        
+        .auth-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .auth-forms {
+            flex: 1;
+            padding: 3rem;
+            position: relative;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-tab {
+            font-family: 'Lexend', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #aaa;
+            background: none;
+            border: none;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .auth-tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+            border-radius: 3px;
+        }
+        
+        .auth-tab.active {
+            color: var(--dark-blue);
+        }
+        
+        .auth-tab.active::after {
+            width: 100%;
+        }
+        
+        .auth-form {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .auth-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+        }
+        
+        .auth-subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-social {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-social-btn {
+            flex: 1;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            padding: 0.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .auth-social-btn:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-3px);
+        }
+        
+        .auth-social-btn i {
+            font-size: 1.2rem;
+        }
+        
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #eee;
+        }
+        
+        .auth-divider span {
+            padding: 0 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+        
+        .form-input.error {
+            border-color: var(--danger);
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+        
+        .error-message.visible {
+            display: block;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .form-check input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .forgot-link {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+        
+        .auth-remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.2);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+        
+        .auth-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.3);
+        }
+        
+        .auth-button:hover::before {
+            left: 100%;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .auth-link {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Account page styles */
+        .account-container {
+            min-height: 100vh;
+            padding: 120px 2rem 2rem;
+            background-color: #f9fafc;
+            position: relative;
+        }
+        
+        .account-header {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .account-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .account-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+        
+        .account-sidebar {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .account-user {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .account-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+        
+        .account-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .account-avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: var(--purple);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .account-avatar-edit:hover {
+            background-color: var(--blue);
+            transform: scale(1.1);
+        }
+        
+        .account-name {
+            font-family: 'Lexend', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .account-email {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .account-level {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .account-menu {
+            list-style: none;
+        }
+        
+        .account-menu-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .account-menu-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--dark);
+            transition: var(--transition);
+        }
+        
+        .account-menu-link:hover {
+            background-color: rgba(108, 99, 255, 0.05);
+            color: var(--purple);
+        }
+        
+        .account-menu-link.active {
+            background-color: rgba(108, 99, 255, 0.1);
+            color: var(--purple);
+            font-weight: 500;
+        }
+        
+        .account-menu-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .account-main {
+            animation: fadeInUp 0.5s ease-out 0.2s both;
+        }
+        
+        .account-section {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .account-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .account-section-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+        
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .account-stat-card {
+            background-color: #f9fafc;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .account-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        .account-stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        
+        .account-stat-icon.xp {
+            background-color: rgba(255, 211, 105, 0.1);
+            color: var(--yellow);
+        }
+        
+        .account-stat-icon.projects {
+            background-color: rgba(108, 99, 255, 0.1);
+            color: var(--purple);
+        }
+        
+        .account-stat-icon.streak {
+            background-color: rgba(233, 69, 96, 0.1);
+            color: var(--pink);
+        }
+        
+        .account-stat-icon.badges {
+            background-color: rgba(18, 130, 162, 0.1);
+            color: var(--blue);
+        }
+        
+        .account-stat-value {
+            font-family: 'Lexend', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .account-stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .progress-section {
+            margin-top: 2rem;
+        }
+        
+        .progress-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .progress-name {
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+        
+        .progress-fill.html {
+            background: linear-gradient(to right, #e44d26, #f16529);
+            width: 85%;
+        }
+        
+        .progress-fill.css {
+            background: linear-gradient(to right, #264de4, #2965f1);
+            width: 70%;
+        }
+        
+        .progress-fill.js {
+            background: linear-gradient(to right, #f0db4f, #ffca28);
+            width: 45%;
+        }
+        
+        .progress-fill.responsive {
+            background: linear-gradient(to right, #6c63ff, #1282a2);
+            width: 60%;
+        }
+        
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+        }
+        
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+        
+        .badge-item:hover {
+            background-color: #f9fafc;
+        }
+        
+        .badge-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        
+        .badge-unlocked {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .badge-locked {
+            background-color: #eee;
+            color: #aaa;
+        }
+        
+        .badge-name {
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .badge-date {
+            font-size: 0.7rem;
+            color: #666;
+        }
+        
+        .projects-list {
+            margin-top: 1.5rem;
+        }
+        
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .project-item:last-child {
+            border-bottom: none;
+        }
+        
+        .project-preview {
+            width: 80px;
+            height: 60px;
+            background-color: #f9fafc;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--purple);
+            font-size: 1.5rem;
+        }
+        
+        .project-info {
+            flex: 1;
+        }
+        
+        .project-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .project-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .project-action {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .project-button {
+            padding: 0.5rem;
+            border-radius: 50%;
+            border: none;
+            background-color: #f5f5f5;
+            color: #666;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        
+        .project-button:hover {
+            background-color: var(--purple);
+            color: white;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .account-button {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: var(--radius);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.2);
+        }
+        
+        .account-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.3);
+        }
+        
+        .account-button.secondary {
+            background: transparent;
+            color: var(--purple);
+            border: 1px solid var(--purple);
+            box-shadow: none;
+        }
+        
+        .account-button.secondary:hover {
+            background-color: rgba(108, 99, 255, 0.05);
+        }
+        
+        .account-button.danger {
+            background: var(--danger);
+        }
+        
+        .account-button.danger:hover {
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+        
+        .settings-group {
+            margin-bottom: 2rem;
+        }
+        
+        .settings-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-info {
+            flex: 1;
+        }
+        
+        .settings-name {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        
+        .settings-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: var(--transition);
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--purple);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .notification-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .notification-icon.success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .notification-icon.warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .notification-icon.info {
+            background-color: rgba(18, 130, 162, 0.1);
+            color: var(--blue);
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-message {
+            margin-bottom: 0.3rem;
+        }
+        
+        .notification-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .auth-box {
+                flex-direction: column;
+            }
+            
+            .auth-visual {
+                padding: 2rem;
+            }
+            
+            .auth-visual-image {
+                max-width: 150px;
+            }
+            
+            .account-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .account-sidebar {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .auth-forms {
+                padding: 2rem;
+            }
+            
+            .auth-social {
+                flex-direction: column;
+            }
+            
+            .account-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .auth-forms {
+                padding: 1.5rem;
+            }
+            
+            .auth-visual {
+                padding: 1.5rem;
+            }
+            
+            .account-section {
+                padding: 1.5rem;
+            }
+            
+            .account-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <div class="logo-icon">C</div>
+            <div class="logo-text">Code<span class="logo-highlight">Quest</span></div>
+        </a>
+        
+        <div class="nav-links">
+            <a href="./index7.html" class="nav-link">Accueil</a>
+            <a href="#" class="nav-link">Comment ça marche</a>
+            <a href="#" class="nav-link">Niveaux</a>
+            <a href="#" class="nav-link">Tarifs</a>
+            <a href="#" class="nav-link">Contact</a>
+        </div>
+    </nav>
+    
+    <!-- Authentication Page -->
+    <div class="auth-container" id="auth-page">
+        <div class="auth-bg-pattern"></div>
+        
+        <div class="auth-box">
+            <div class="auth-visual">
+                <div class="auth-visual-content">
+                    <h2 class="auth-visual-title">Commencez votre aventure de code</h2>
+                    <p class="auth-visual-description">Rejoignez une communauté de développeurs passionnés</p>
+                    
+                    <img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="CodeQuest Adventure" class="auth-visual-image">
+                    
+                    <div class="auth-visual-badges">
+                        <div class="auth-badge">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Apprentissage ludique</span>
+                        </div>
+                        <div class="auth-badge">
+                            <i class="fas fa-trophy"></i>
+                            <span>Récompenses</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="auth-forms">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-form="login-form">Connexion</button>
+                    <button class="auth-tab" data-form="register-form">Inscription</button>
+                </div>
+                
+                <!-- Login Form -->
+                <form class="auth-form active" id="login-form">
+                    <h2 class="auth-title">Bon retour parmi nous !</h2>
+                    <p class="auth-subtitle">Connectez-vous pour continuer votre aventure</p>
+                    
+                    <div class="auth-social">
+                        <button type="button" class="auth-social-btn">
+                            <i class="fab fa-google" style="color: #DB4437;"></i>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="auth-social-btn">
+                            <i class="fab fa-github" style="color: #333;"></i>
+                            <span>GitHub</span>
+                        </button>
+                    </div>
+                    
+                    <div class="auth-divider">
+                        <span>ou</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="login-email">Email</label>
+                        <input type="email" class="form-input" id="login-email" placeholder="votre@email.com" required>
+                        <div class="error-message" id="login-email-error">Veuillez entrer une adresse email valide</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="login-password">Mot de passe</label>
+                        <input type="password" class="form-input" id="login-password" placeholder="Votre mot de passe" required>
+                        <div class="error-message" id="login-password-error">Le mot de passe doit contenir au moins 6 caractères</div>
+                    </div>
+                    
+                    <div class="auth-remember-forgot">
+                        <label class="form-check">
+                            <input type="checkbox" id="remember-me">
+                            <span>Se souvenir de moi</span>
+                        </label>
+                        
+                        <a href="#" class="forgot-link">Mot de passe oublié?</a>
+                    </div>
+                    
+                    <button type="submit" class="auth-button">Se connecter</button>
+                    
+                    <p class="auth-footer">
+                        Vous n'avez pas de compte ? <a href="#" class="auth-link" id="switch-to-register">S'inscrire</a>
+                    </p>
+                </form>
+                
+                <!-- Register Form -->
+                <form class="auth-form" id="register-form">
+                    <h2 class="auth-title">Rejoignez l'aventure</h2>
+                    <p class="auth-subtitle">Créez votre compte pour commencer à apprendre</p>
+                    
+                    <div class="auth-social">
+                        <button type="button" class="auth-social-btn">
+                            <i class="fab fa-google" style="color: #DB4437;"></i>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="auth-social-btn">
+                            <i class="fab fa-github" style="color: #333;"></i>
+                            <span>GitHub</span>
+                        </button>
+                    </div>
+                    
+                    <div class="auth-divider">
+                        <span>ou</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-name">Nom complet</label>
+                        <input type="text" class="form-input" id="register-name" placeholder="Votre nom" required>
+                        <div class="error-message" id="register-name-error">Veuillez entrer votre nom</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-email">Email</label>
+                        <input type="email" class="form-input" id="register-email" placeholder="votre@email.com" required>
+                        <div class="error-message" id="register-email-error">Veuillez entrer une adresse email valide</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-password">Mot de passe</label>
+                        <input type="password" class="form-input" id="register-password" placeholder="Minimum 6 caractères" required>
+                        <div class="error-message" id="register-password-error">Le mot de passe doit contenir au moins 6 caractères</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-confirm">Confirmer le mot de passe</label>
+                        <input type="password" class="form-input" id="register-confirm" placeholder="Confirmez votre mot de passe" required>
+                        <div class="error-message" id="register-confirm-error">Les mots de passe ne correspondent pas</div>
+                    </div>
+                    
+                    <label class="form-check">
+                        <input type="checkbox" id="terms" required>
+                        <span>J'accepte les <a href="#" class="auth-link">termes et conditions</a></span>
+                    </label>
+                    
+                    <button type="submit" class="auth-button">S'inscrire</button>
+                    
+                    <p class="auth-footer">
+                        Vous avez déjà un compte ? <a href="#" class="auth-link" id="switch-to-login">Se connecter</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Account Page -->
+    <div class="account-container" id="account-page" style="display: none;">
+        <div class="account-header">
+            <h1 class="account-title">Mon Compte</h1>
+            
+            <button class="account-button secondary" id="logout-button">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </button>
+        </div>
+        
+        <div class="account-content">
+            <div class="account-sidebar">
+                <div class="account-user">
+                    <div class="account-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Alex Durand">
+                        <div class="account-avatar-edit">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <h3 class="account-name">Alex Durand</h3>
+                    <p class="account-email">alex.durand@example.com</p>
+                    <div class="account-level">Niveau 8</div>
+                </div>
+                
+                <ul class="account-menu">
+                    <li class="account-menu-item">
+                        <a href="#" class="account-menu-link active" data-section="dashboard">
+                            <span class="account-menu-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li class="account-menu-item">
+                        <a href="#" class="account-menu-link" data-section="profile">
+                            <span class="account-menu-icon"><i class="fas fa-user"></i></span>
+                            <span>Profil</span>
+                        </a>
+                    </li>
+                    <li class="account-menu-item">
+                        <a href="#" class="account-menu-link" data-section="projects">
+                            <span class="account-menu-icon"><i class="fas fa-code"></i></span>
+                            <span>Mes projets</span>
+                        </a>
+                    </li>
+                    <li class="account-menu-item">
+                        <a href="#" class="account-menu-link" data-section="badges">
+                            <span class="account-menu-icon"><i class="fas fa-medal"></i></span>
+                            <span>Badges</span>
+                        </a>
+                    </li>
+                    <li class="account-menu-item">
+                        <a href="#" class="account-menu-link" data-section="notifications">
+                            <span class="account-menu-icon"><i class="fas fa-bell"></i></span>
+                            <span>Notifications</span>
+                        </a>
+                    </li>
+                    <li class="account-menu-item">
+                        <a href="#" class="account-menu-link" data-section="settings">
+                            <span class="account-menu-icon"><i class="fas fa-cog"></i></span>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="account-main">
+                <!-- Dashboard Section -->
+                <div class="account-section active" id="dashboard-section">
+                    <div class="account-section-header">
+                        <h2 class="account-section-title">Tableau de bord</h2>
+                    </div>
+                    
+                    <div class="account-grid">
+                        <div class="account-stat-card">
+                            <div class="account-stat-icon xp">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="account-stat-value">15,480</div>
+                            <div class="account-stat-label">Points d'expérience</div>
+                        </div>
+                        
+                        <div class="account-stat-card">
+                            <div class="account-stat-icon projects">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="account-stat-value">12</div>
+                            <div class="account-stat-label">Projets complétés</div>
+                        </div>
+                        
+                        <div class="account-stat-card">
+                            <div class="account-stat-icon streak">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="account-stat-value">42</div>
+                            <div class="account-stat-label">Jours consécutifs</div>
+                        </div>
+                        
+                        <div class="account-stat-card">
+                            <div class="account-stat-icon badges">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <div class="account-stat-value">18</div>
+                            <div class="account-stat-label">Badges débloqués</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <h3 class="progress-title">Ma progression</h3>
+                        
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <div class="progress-name">HTML & Structure</div>
+                                <div class="progress-value">85%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill html"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <div class="progress-name">CSS & Styling</div>
+                                <div class="progress-value">70%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill css"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <div class="progress-name">JavaScript</div>
+                                <div class="progress-value">45%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill js"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <div class="progress-name">Responsive Design</div>
+                                <div class="progress-value">60%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill responsive"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Section -->
+                <div class="account-section" id="profile-section" style="display: none;">
+                    <div class="account-section-header">
+                        <h2 class="account-section-title">Mon Profil</h2>
+                    </div>
+                    
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="profile-name">Nom complet</label>
+                                <input type="text" class="form-input" id="profile-name" value="Alex Durand">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="profile-email">Email</label>
+                                <input type="email" class="form-input" id="profile-email" value="alex.durand@example.com">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="profile-username">Nom d'utilisateur</label>
+                                <input type="text" class="form-input" id="profile-username" value="alexcoder">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="profile-location">Localisation</label>
+                                <input type="text" class="form-input" id="profile-location" value="Paris, France">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="profile-bio">Bio</label>
+                            <textarea class="form-input" id="profile-bio" rows="4">Développeur web passionné, j'aime créer des interfaces intuitives et élégantes. Actuellement en apprentissage de JavaScript avancé et des frameworks frontend.</textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="profile-github">GitHub</label>
+                                <input type="text" class="form-input" id="profile-github" value="github.com/alexcoder">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="profile-website">Site web</label>
+                                <input type="text" class="form-input" id="profile-website" value="alexdurand.com">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="account-button">Sauvegarder les modifications</button>
+                    </form>
+                </div>
+                
+                <!-- Projects Section -->
+                <div class="account-section" id="projects-section" style="display: none;">
+                    <div class="account-section-header">
+                        <h2 class="account-section-title">Mes Projets</h2>
+                        <button class="account-button">Nouveau projet</button>
+                    </div>
+                    
+                    <div class="projects-list">
+                        <div class="project-item">
+                            <div class="project-preview">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="project-info">
+                                <h3 class="project-title">Portfolio personnel</h3>
+                                <p class="project-date">Complété le 15 avril 2025</p>
+                            </div>
+                            <div class="project-action">
+                                <button class="project-button"><i class="fas fa-eye"></i></button>
+                                <button class="project-button"><i class="fas fa-edit"></i></button>
+                                <button class="project-button"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="project-item">
+                            <div class="project-preview">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="project-info">
+                                <h3 class="project-title">Application météo</h3>
+                                <p class="project-date">Complété le 2 mars 2025</p>
+                            </div>
+                            <div class="project-action">
+                                <button class="project-button"><i class="fas fa-eye"></i></button>
+                                <button class="project-button"><i class="fas fa-edit"></i></button>
+                                <button class="project-button"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="project-item">
+                            <div class="project-preview">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="project-info">
+                                <h3 class="project-title">Site e-commerce</h3>
+                                <p class="project-date">En cours - 60% complété</p>
+                            </div>
+                            <div class="project-action">
+                                <button class="project-button"><i class="fas fa-eye"></i></button>
+                                <button class="project-button"><i class="fas fa-edit"></i></button>
+                                <button class="project-button"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Badges Section -->
+                <div class="account-section" id="badges-section" style="display: none;">
+                    <div class="account-section-header">
+                        <h2 class="account-section-title">Mes Badges</h2>
+                    </div>
+                    
+                    <div class="badges-grid">
+                        <div class="badge-item">
+                            <div class="badge-icon badge-unlocked">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="badge-name">Premiers pas</div>
+                            <div class="badge-date">15 jan 2025</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon badge-unlocked">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="badge-name">Streak 30 jours</div>
+                            <div class="badge-date">2 fév 2025</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon badge-unlocked">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="badge-name">HTML Master</div>
+                            <div class="badge-date">10 fév 2025</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon badge-unlocked">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <div class="badge-name">CSS Wizard</div>
+                            <div class="badge-date">25 fév 2025</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon badge-unlocked">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <div class="badge-name">Premier projet</div>
+                            <div class="badge-date">15 mars 2025</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon badge-locked">
+                                <i class="fas fa-js"></i>
+                            </div>
+                            <div class="badge-name">JS Expert</div>
+                            <div class="badge-date">Non débloqué</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon badge-locked">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="badge-name">Responsive Guru</div>
+                            <div class="badge-date">Non débloqué</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon badge-locked">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="badge-name">10 projets</div>
+                            <div class="badge-date">Non débloqué</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notifications Section -->
+                <div class="account-section" id="notifications-section" style="display: none;">
+                    <div class="account-section-header">
+                        <h2 class="account-section-title">Notifications</h2>
+                        <button class="account-button secondary">Marquer comme lu</button>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon success">
+                            <i class="fas fa-badge-check"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-message">Félicitations ! Vous avez débloqué le badge "CSS Wizard".</div>
+                            <div class="notification-time">il y a 2 jours</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="project-button"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-message">Un nouveau cours "Introduction à JavaScript" est disponible !</div>
+                            <div class="notification-time">il y a 4 jours</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="project-button"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-message">Attention, vous n'avez pas pratiqué depuis 3 jours ! Ne perdez pas votre streak.</div>
+                            <div class="notification-time">il y a 5 jours</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="project-button"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div class="account-section" id="settings-section" style="display: none;">
+                    <div class="account-section-header">
+                        <h2 class="account-section-title">Paramètres</h2>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h3 class="settings-title">Préférences d'apprentissage</h3>
+                        
+                        <div class="settings-option">
+                            <div class="settings-info">
+                                <div class="settings-name">Mode sombre</div>
+                                <div class="settings-description">Activer le thème sombre pour l'interface</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="settings-option">
+                            <div class="settings-info">
+                                <div class="settings-name">Rappels quotidiens</div>
+                                <div class="settings-description">Recevoir des rappels pour pratiquer chaque jour</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="settings-option">
+                            <div class="settings-info">
+                                <div class="settings-name">Sons d'interface</div>
+                                <div class="settings-description">Activer les effets sonores dans l'application</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h3 class="settings-title">Sécurité du compte</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="settings-current-password">Mot de passe actuel</label>
+                            <input type="password" class="form-input" id="settings-current-password">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="settings-new-password">Nouveau mot de passe</label>
+                                <input type="password" class="form-input" id="settings-new-password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="settings-confirm-password">Confirmer le mot de passe</label>
+                                <input type="password" class="form-input" id="settings-confirm-password">
+                            </div>
+                        </div>
+                        
+                        <button class="account-button">Changer le mot de passe</button>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h3 class="settings-title">Notifications</h3>
+                        
+                        <div class="settings-option">
+                            <div class="settings-info">
+                                <div class="settings-name">Emails</div>
+                                <div class="settings-description">Recevoir des emails sur les nouveaux cours et mises à jour</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="settings-option">
+                            <div class="settings-info">
+                                <div class="settings-name">Notifications push</div>
+                                <div class="settings-description">Recevoir des notifications sur votre appareil</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h3 class="settings-title">Actions du compte</h3>
+                        
+                        <div class="form-group">
+                            <button class="account-button secondary">Exporter mes données</button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button class="account-button danger">Supprimer mon compte</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auth tabs switching
+            const authTabs = document.querySelectorAll('.auth-tab');
+            const authForms = document.querySelectorAll('.auth-form');
+            
+            authTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const formId = this.getAttribute('data-form');
+                    
+                    // Update active tab
+                    authTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show active form
+                    authForms.forEach(form => {
+                        form.classList.remove('active');
+                        if (form.id === formId) {
+                            form.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Auth form links
+            document.getElementById('switch-to-register').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('[data-form="register-form"]').click();
+            });
+            
+            document.getElementById('switch-to-login').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('[data-form="login-form"]').click();
+            });
+            
+            // Form validation
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    let valid = true;
+                    const email = document.getElementById('login-email');
+                    const password = document.getElementById('login-password');
+                    
+                    // Simple validation
+                    if (!email.value.includes('@')) {
+                        document.getElementById('login-email-error').classList.add('visible');
+                        email.classList.add('error');
+                        valid = false;
+                    } else {
+                        document.getElementById('login-email-error').classList.remove('visible');
+                        email.classList.remove('error');
+                    }
+                    
+                    if (password.value.length < 6) {
+                        document.getElementById('login-password-error').classList.add('visible');
+                        password.classList.add('error');
+                        valid = false;
+                    } else {
+                        document.getElementById('login-password-error').classList.remove('visible');
+                        password.classList.remove('error');
+                    }
+                    
+                    if (valid) {
+                        // Show account page (for demo)
+                        document.getElementById('auth-page').style.display = 'none';
+                        document.getElementById('account-page').style.display = 'block';
+                    }
+                });
+            }
+            
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    let valid = true;
+                    const name = document.getElementById('register-name');
+                    const email = document.getElementById('register-email');
+                    const password = document.getElementById('register-password');
+                    const confirm = document.getElementById('register-confirm');
+                    
+                    // Simple validation
+                    if (name.value.trim() === '') {
+                        document.getElementById('register-name-error').classList.add('visible');
+                        name.classList.add('error');
+                        valid = false;
+                    } else {
+                        document.getElementById('register-name-error').classList.remove('visible');
+                        name.classList.remove('error');
+                    }
+                    
+                    if (!email.value.includes('@')) {
+                        document.getElementById('register-email-error').classList.add('visible');
+                        email.classList.add('error');
+                        valid = false;
+                    } else {
+                        document.getElementById('register-email-error').classList.remove('visible');
+                        email.classList.remove('error');
+                    }
+                    
+                    if (password.value.length < 6) {
+                        document.getElementById('register-password-error').classList.add('visible');
+                        password.classList.add('error');
+                        valid = false;
+                    } else {
+                        document.getElementById('register-password-error').classList.remove('visible');
+                        password.classList.remove('error');
+                    }
+                    
+                    if (password.value !== confirm.value) {
+                        document.getElementById('register-confirm-error').classList.add('visible');
+                        confirm.classList.add('error');
+                        valid = false;
+                    } else {
+                        document.getElementById('register-confirm-error').classList.remove('visible');
+                        confirm.classList.remove('error');
+                    }
+                    
+                    if (valid) {
+                        // Show account page (for demo)
+                        document.getElementById('auth-page').style.display = 'none';
+                        document.getElementById('account-page').style.display = 'block';
+                    }
+                });
+            }
+            
+            // Account sections navigation
+            const accountMenuLinks = document.querySelectorAll('.account-menu-link');
+            const accountSections = document.querySelectorAll('.account-section');
+            
+            accountMenuLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    // Update active menu link
+                    accountMenuLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show active section
+                    accountSections.forEach(section => {
+                        section.style.display = 'none';
+                        if (section.id === `${sectionId}-section`) {
+                            section.style.display = 'block';
+                        }
+                    });
+                });
+            });
+            
+            // Logout button
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Return to auth page (for demo)
+                    document.getElementById('auth-page').style.display = 'block';
+                    document.getElementById('account-page').style.display = 'none';
+                    
+                    // Reset form
+                    document.getElementById('login-form').reset();
+                    document.getElementById('register-form').reset();
+                });
+            }
+            
+            // Animate progress bars on load
+            setTimeout(() => {
+                const progressBars = document.querySelectorAll('.progress-fill');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 300);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
